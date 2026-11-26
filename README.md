@@ -1,39 +1,46 @@
----
-# PicoLibrary
-A collection of classes around the Raspberry Pi Pico Hardware interface to make it easy to 
-work with Lights (LEDs, RGB LEDs), Sound (active and passive buzzers), Displays (Dot matrix 
-with Max7219, 7 segment displays bare and with TM 1637, 160x LCD modules with I2C backpacks
-and without I2C, as well as OLED/LCD displays with I2C), and all kinds of sensors, keypad 
-and other types of accessories.
----
+# Mini-Lab 4: IoT CRM Browser (Pico 2W)
 
-All classes and sublclasses are placed at the root level of the library to allow use of some of
-the simulation platforms that do not support folders. (Almost) all classes have been tested on
-real hardware (currently the only exception is the MQ2 gas sensor)
+**Emanuel Petrini, PantherID 6288457, ISM 6106**
 
-You can check out the YouTube Channel (https://youtube.com/@designwithpython) that covers many
-of these classes, including an ongoing Tutorial series.
+A Raspberry Pi Pico 2W browses the course CRM REST web service
+(`https://iacademy.oracle.com/ords/ism6106/customer/`) and shows customers, contacts and
+activities on a 16x2 LCD. It is built on [PicoLibrary](https://github.com/jitsengupta/PicoLibrary).
 
-Also includes simple support for buttons and a basic implementation of a state model for
-creating simple state machines.
+## Loading options (picked at boot)
+- **Prev = Option A (EagerLoader):** loads every customer, then every customer's contacts and activities, before browsing starts.
+- **Next = Option B (LazyLoader):** loads only the customers. A customer's contacts and activities are fetched the first time it is selected, then cached.
 
-Currently supported hardware - (more to be added)
+The LCD and the console both show the load time and the number of REST calls, so the two options can be compared.
 
-* Buttons - both pulled-down and pulled-up buttons supported
-* Buzzers - both active and passive buzzers supported
-* LEDs - Basic LEDs (on/off) and Dimmable LEDs (setting brightness level)
-* Composite lights - TrafficLight (red, yellow, green), Pixel (R, G, B) and NeoPixel (PIO)
-* Displays - 160x displays (both I2C as well has GPIO)
-* Displays - OLED displays (SSD1306 driver)
-* LCD Displays - Currently ST7789 only supported
-* Displays - 7 segment displays both raw using shift registers as well as with backpacks like MAX7219 or TM1637
-* LED matrix displays - (MAX7219 driver)
-* Sensors - both ditigal (0/1) as well as Analog (ADC 16 bit) sensors
-* Specialized Sensors - Ultrasonic Sensor, Temp sensor, DHT11/DHT12 temp/hum sensor and Tilt sensor, MQ-2 gas sensor
-* RFID Reader - supports the RC522 13.56MHz RFID reader (SPI)
-* Keypad - standard 4x4 alphanumeric keypads
-* I2S audio boards - currently only output supported via SoundPlayer, but input (microphone) coming soon.
-* Motor controllers - stepper motor controllers (L293D, L298N),servo motor controllers (SG90, MG996R)
-* Lora long range communication using DX-LR22 or similar boards using UART serial communication
+## Hardware
+| Part | Pin |
+|---|---|
+| 16x2 I2C LCD | SDA GP0, SCL GP1 |
+| 8-LED NeoPixel ring | GP2 |
+| Passive buzzer | GP16 |
+| Prev / Next / Select buttons | GP17 / GP18 / GP19 |
 
-Contact Dr. Sengupta if you need support for any other hardware
+Ring colours: blue = loading progress, amber = details not loaded yet, green = has activities, red = no activities.
+
+## Controls
+- **Prev / Next:** move through customers, contacts or activities.
+- **Select:** go from customer to contacts, then to activities, then back to customers.
+
+## Files
+| File | Purpose |
+|---|---|
+| `main.py` | Entry point |
+| `config.py` | WiFi SSID and password, base URL, and my customer name |
+| `CRMController.py` | StateModel handler: states MODE, LOADING, CUSTOMERS, CONTACTS, ACTIVITIES |
+| `DataLoader.py` | Strategy pattern: `DataLoader`, `EagerLoader` (A), `LazyLoader` (B) |
+| `CRMService.py` | REST proxy over `Net.getJson()` |
+| `CRMModel.py` | `Customer`, `Contact`, `Activity` |
+| `CRMView.py` | LCD, light ring and buzzer output |
+| `Trace.py` | Prints `[t s] Source -> Target: message` lines that follow the sequence diagrams |
+
+All other `.py` files are the PicoLibrary modules this app needs.
+
+## Run
+1. Copy all the `.py` files to the Pico.
+2. In `config.py`, set `WIFI_SSID` and `WIFI_PASSWORD`. Use a 2.4 GHz network.
+3. Run `main.py` from Thonny.
