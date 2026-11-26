@@ -134,7 +134,7 @@ class CRMController:
         try:
             if not self._net.isConnected():
                 Trace.call("CRMController", "Net", f"connect({config.WIFI_SSID})")
-                self._net.connect(config.WIFI_SSID, config.WIFI_PASSWORD)
+                self._net.connect(config.WIFI_SSID, config.WIFI_PASSWORD, max_wait=30)
                 print()
                 Trace.reply("CRMController", "Net", f"connected, IP {self._net.getLocalIp()}")
         except Exception as e:
