@@ -8,7 +8,7 @@ On the real Pico 2 W, put your phone hotspot name and password here.
 """
 
 WIFI_SSID = "Wokwi-GUEST"
-WIFI_PASSWORD = None          # None = open network; use a string for a hotspot
+WIFI_PASSWORD = ""            # "" for Wokwi-GUEST; your hotspot password on the real Pico
 
 BASE_URL = "https://iacademy.oracle.com/ords/ism6106/customer/"
 
